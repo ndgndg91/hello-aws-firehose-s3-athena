@@ -6,7 +6,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 
 @EnableScheduling
 @SpringBootApplication
-class ExcelDemoApplication
+class HelloFirehoseAthenaApplication
 
 //    @Bean
 //    fun run(excelGenerator: ExcelGenerator) = CommandLineRunner {
@@ -19,5 +19,5 @@ class ExcelDemoApplication
 //}
 
 fun main(args: Array<String>) {
-    runApplication<ExcelDemoApplication>(*args)
+    runApplication<HelloFirehoseAthenaApplication>(*args)
 }
