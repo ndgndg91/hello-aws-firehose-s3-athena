@@ -12,8 +12,8 @@ resource "aws_kinesis_firehose_delivery_stream" "user_history_stream" {
       enabled = true
     }
 
-    # This processing configuration extracts the 'dt' field from the JSON record
-    # and makes it available for dynamic partitioning.
+    # This processing configuration extracts the 'dt' and 'account_id' fields from the JSON record
+    # and makes them available for dynamic partitioning.
     processing_configuration {
       enabled = true
       processors {
@@ -24,7 +24,7 @@ resource "aws_kinesis_firehose_delivery_stream" "user_history_stream" {
         }
         parameters {
           parameter_name  = "MetadataExtractionQuery"
-          parameter_value = "{dt: .dt}"
+          parameter_value = "{dt: .dt, account_id: .account_id}"
         }
       }
       processors {
@@ -36,8 +36,8 @@ resource "aws_kinesis_firehose_delivery_stream" "user_history_stream" {
       }
     }
 
-    # S3 object prefix using the dynamically extracted 'dt' partition key
-    prefix              = "prefix/dt=!{partitionKeyFromQuery:dt}/"
+    # S3 object prefix using the dynamically extracted partition keys
+    prefix              = "prefix/dt=!{partitionKeyFromQuery:dt}/account_id=!{partitionKeyFromQuery:account_id}/"
     error_output_prefix = "error/!{firehose:error-output-type}/"
 
     # Buffer settings
