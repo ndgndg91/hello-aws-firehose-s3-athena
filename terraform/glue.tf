@@ -19,7 +19,7 @@ resource "aws_glue_catalog_table" "user_history_logs" {
     "projection.dt.interval"           = "1"
     "projection.dt.interval.unit"      = "DAYS"
     "projection.part.type"             = "integer"
-    "projection.part.range"            = "0,499"
+    "projection.part.range"            = "0,249"
     "storage.location.template"        = "s3://${aws_s3_bucket.log_bucket.bucket}/prefix/dt=$${dt}/part=$${part}/"
   }
 
@@ -60,7 +60,7 @@ resource "aws_glue_catalog_table" "user_history_logs" {
   }
   partition_keys {
     name = "part"
-    type = "integer"
+    type = "int"
   }
 
   depends_on = [

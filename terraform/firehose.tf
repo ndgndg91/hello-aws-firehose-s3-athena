@@ -24,7 +24,7 @@ resource "aws_kinesis_firehose_delivery_stream" "user_history_stream" {
         }
         parameters {
           parameter_name  = "MetadataExtractionQuery"
-          parameter_value = "{dt: .dt, account_id_part: (.account_id % 500)}"
+          parameter_value = "{dt: .dt, account_id_part: (.account_id % 250)}"
         }
       }
       processors {
