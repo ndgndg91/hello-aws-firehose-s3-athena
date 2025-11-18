@@ -7,5 +7,5 @@ variable "aws_region" {
 variable "project_name" {
   description = "A name for the project to prefix resources."
   type        = string
-  default     = "excel-demo-logs"
+  default     = "excel-demo-logs-new"
 }
