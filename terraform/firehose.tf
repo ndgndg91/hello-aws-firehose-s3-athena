@@ -24,7 +24,7 @@ resource "aws_kinesis_firehose_delivery_stream" "user_history_stream" {
         }
         parameters {
           parameter_name  = "MetadataExtractionQuery"
-          parameter_value = "{dt: .dt, account_id: .account_id}"
+          parameter_value = "{dt: .dt, account_id_part: (.account_id % 500)}"
         }
       }
       processors {
@@ -37,7 +37,7 @@ resource "aws_kinesis_firehose_delivery_stream" "user_history_stream" {
     }
 
     # S3 object prefix using the dynamically extracted partition keys
-    prefix              = "prefix/dt=!{partitionKeyFromQuery:dt}/account_id=!{partitionKeyFromQuery:account_id}/"
+    prefix              = "prefix/dt=!{partitionKeyFromQuery:dt}/part=!{partitionKeyFromQuery:account_id_part}/"
     error_output_prefix = "error/!{firehose:error-output-type}/"
 
     # Buffer settings

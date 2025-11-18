@@ -18,8 +18,9 @@ resource "aws_glue_catalog_table" "user_history_logs" {
     "projection.dt.format"             = "yyyy-MM-dd"
     "projection.dt.interval"           = "1"
     "projection.dt.interval.unit"      = "DAYS"
-    "projection.account_id.type"       = "injected"
-    "storage.location.template"        = "s3://${aws_s3_bucket.log_bucket.bucket}/prefix/dt=$${dt}/account_id=$${account_id}"
+    "projection.part.type"             = "integer"
+    "projection.part.range"            = "0,499"
+    "storage.location.template"        = "s3://${aws_s3_bucket.log_bucket.bucket}/prefix/dt=$${dt}/part=$${part}/"
   }
 
   storage_descriptor {
@@ -40,6 +41,10 @@ resource "aws_glue_catalog_table" "user_history_logs" {
       type = "string"
     }
     columns {
+      name = "account_id"
+      type = "bigint"
+    }
+    columns {
       name = "created_at"
       type = "bigint"
     }
@@ -54,8 +59,8 @@ resource "aws_glue_catalog_table" "user_history_logs" {
     type = "string"
   }
   partition_keys {
-    name = "account_id"
-    type = "bigint"
+    name = "part"
+    type = "integer"
   }
 
   depends_on = [
