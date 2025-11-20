@@ -10,15 +10,17 @@ resource "aws_glue_catalog_table" "user_history_logs" {
   table_type    = "EXTERNAL_TABLE"
 
   parameters = {
-    "EXTERNAL"                    = "TRUE"
-    "parquet.compress"            = "SNAPPY"
-    "projection.enabled"          = "true"
-    "projection.dt.type"          = "date"
-    "projection.dt.range"         = "2025-01-01,NOW"
-    "projection.dt.format"        = "yyyy-MM-dd"
-    "projection.dt.interval"      = "1"
-    "projection.dt.interval.unit" = "DAYS"
-    "storage.location.template"   = "s3://${aws_s3_bucket.log_bucket.bucket}/prefix/dt=$${dt}"
+    "EXTERNAL"                         = "TRUE"
+    "parquet.compress"                 = "SNAPPY"
+    "projection.enabled"               = "true"
+    "projection.dt.type"               = "date"
+    "projection.dt.range"              = "2025-01-01,NOW"
+    "projection.dt.format"             = "yyyy-MM-dd"
+    "projection.dt.interval"           = "1"
+    "projection.dt.interval.unit"      = "DAYS"
+    "projection.part.type"             = "integer"
+    "projection.part.range"            = "0,249"
+    "storage.location.template"        = "s3://${aws_s3_bucket.log_bucket.bucket}/prefix/dt=$${dt}/part=$${part}/"
   }
 
   storage_descriptor {
@@ -35,12 +37,12 @@ resource "aws_glue_catalog_table" "user_history_logs" {
     }
 
     columns {
-      name = "account_id"
-      type = "bigint"
-    }
-    columns {
       name = "type"
       type = "string"
+    }
+    columns {
+      name = "account_id"
+      type = "bigint"
     }
     columns {
       name = "created_at"
@@ -55,6 +57,10 @@ resource "aws_glue_catalog_table" "user_history_logs" {
   partition_keys {
     name = "dt"
     type = "string"
+  }
+  partition_keys {
+    name = "part"
+    type = "int"
   }
 
   depends_on = [

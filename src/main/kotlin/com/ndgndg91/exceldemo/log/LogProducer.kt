@@ -9,15 +9,26 @@ import software.amazon.awssdk.services.firehose.FirehoseAsyncClient
 import software.amazon.awssdk.services.firehose.model.PutRecordBatchRequest
 import software.amazon.awssdk.services.firehose.model.PutRecordRequest
 import software.amazon.awssdk.services.firehose.model.Record
+import java.time.LocalDate
 import java.util.concurrent.CompletableFuture
 
 @Service
 class LogProducer(
     private val firehoseClient: FirehoseAsyncClient,
     private val objectMapper: ObjectMapper,
-    @Value("\${aws.firehose.stream-name}") private val streamName: String
+    private val mockLogGenerator: MockLogGenerator,
+    @param:Value("\${aws.firehose.stream-name}") private val streamName: String
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
+
+    fun produce(targetDate: LocalDate) {
+        val userHistoryLog = mockLogGenerator.generate(targetDate)
+        send(userHistoryLog)
+    }
+
+    fun produce() {
+        produce(LocalDate.now())
+    }
 
     fun send(log: UserHistoryLog): CompletableFuture<Void> {
         val jsonLog = objectMapper.writeValueAsString(log)

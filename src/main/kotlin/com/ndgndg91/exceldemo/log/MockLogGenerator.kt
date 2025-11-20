@@ -9,20 +9,14 @@ import java.util.concurrent.ThreadLocalRandom
 class MockLogGenerator {
 
     private val logTypes = listOf("LOGIN", "LOGOUT", "PURCHASE", "VIEW_ITEM", "ADD_TO_CART", "CHECKOUT")
-    private val startEpochDay = LocalDate.of(2025, 1, 1).toEpochDay()
 
-    fun generate(): UserHistoryLog {
+    fun generate(targetDate: LocalDate): UserHistoryLog {
         val accountId = ThreadLocalRandom.current().nextLong(1, 4_000_001)
         val type = logTypes.random()
 
-        // 1. Generate a random date
-        val todayEpochDay = LocalDate.now().toEpochDay()
-        val randomEpochDay = ThreadLocalRandom.current().nextLong(startEpochDay, todayEpochDay + 1)
-        val randomDate = LocalDate.ofEpochDay(randomEpochDay)
-
-        // 2. Generate a random millisecond timestamp within that random date
-        val startOfDaySeconds = randomDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC)
-        val endOfDaySeconds = randomDate.plusDays(1).atStartOfDay().toEpochSecond(ZoneOffset.UTC) - 1
+        // 1. Generate a random millisecond timestamp within the given target date
+        val startOfDaySeconds = targetDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+        val endOfDaySeconds = targetDate.plusDays(1).atStartOfDay().toEpochSecond(ZoneOffset.UTC) - 1
         val randomTimestampSeconds = ThreadLocalRandom.current().nextLong(startOfDaySeconds, endOfDaySeconds + 1)
         val randomMillis = ThreadLocalRandom.current().nextLong(0, 1000)
         val randomCreatedAt = (randomTimestampSeconds * 1000) + randomMillis
@@ -33,7 +27,7 @@ class MockLogGenerator {
             else -> mapOf("device" to listOf("web", "mobile").random(), "ip_address" to "192.168.${ThreadLocalRandom.current().nextInt(0, 256)}.${ThreadLocalRandom.current().nextInt(1, 255)}")
         }
 
-        // 3. Create the log. 'dt' will be computed automatically from 'createdAt'.
+        // 2. Create the log. 'dt' will be computed automatically from 'createdAt'.
         return UserHistoryLog(
             accountId = accountId,
             type = type,
